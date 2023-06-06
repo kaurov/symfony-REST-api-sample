@@ -53,8 +53,8 @@ services:
     environment:
       - PGADMIN_DEFAULT_EMAIL=user@domain.com
       - PGADMIN_DEFAULT_PASSWORD=SuperSecret
-    volumes:
-      - ./.pgadmin:/var/lib/pgadmin
+#    volumes:
+#      - ./.pgadmin:/var/lib/pgadmin
     depends_on:
       - psql.test
     networks:
@@ -74,3 +74,7 @@ services:
       - psql.test
     networks:
       - saf_api
+
+volumes:
+  sync:
+    external: true
