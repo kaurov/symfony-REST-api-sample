@@ -5,7 +5,10 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Ignore;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\Type;
 
 /**
  * Customers Entity
@@ -34,39 +37,56 @@ class CustomerEntity extends AbstractEntity
 
     /**
      * Constructor
+     *
+     * @param string         $lastName
      * @param string         $firstName
-     * @param string         $name
      * @param \DateTime|null $birthDateTime
-     * @param bool           $isDeleted
-     * @param string         $sex
+     * @param string         $gender
      * @param string         $email
      * @param int            $agentId
+     * @param bool           $isDeleted
+     * @param                $addresses
+     * @param                $agent
      */
     public function __construct(
-        #[ORM\Column(type: "string", name: "vorname")]
-        #[Assert\NotBlank(message: "customer first name is required.")]
-        string $firstName = '',
-
         #[ORM\Column(type: "string", name: "name")]
         #[Assert\NotBlank(message: "Customer name is required.")]
-        string $name = '',
+        #[SerializedName('name')]
+        protected string $lastName = '',
 
+        #[ORM\Column(type: "string", name: "vorname")]
+        #[Assert\NotBlank(message: "customer first name is required.")]
+        #[SerializedName('vorname')]
+        protected string $firstName = '',
+
+        /**
+         * @SerializedName("geburtsdatum")
+         * @Type("DateTime<'Y-m-d'>")
+         */
         #[ORM\Column(type: "datetime", name: "geburtsdatum", columnDefinition: "timestamp default current_timestamp")]
-        ?\DateTime $birthDateTime = null,
-
-        #[ORM\Column(type: "boolean", name: "geloescht", nullable: false)]
-        bool $isDeleted = false,
+        #[Assert\DateTime(message: "Birth date should be null or valid date Y-m-d like 1970-01-01")]
+        #[SerializedName('geburtsdatum')]
+        protected ?\DateTime $birthDateTime = null,
 
         #[ORM\Column(type: "string", name: "geschlecht", nullable: true)]
-        #[Assert\Choice(choices: static::GENDER_ALLOWED, message: "Invalid gender value")]
-        string $sex = '',
+        #[Assert\Choice(choices: self::GENDER_ALLOWED, message: "Invalid gender value")]
+        #[SerializedName('geschlecht')]
+        protected string $gender = '',
 
         #[ORM\Column(type: "string", name: "email", nullable: true)]
         #[Assert\Email(message: "Invalid email address!")]
-        string $email = '',
+        protected string $email = '',
 
         #[ORM\Column(type: "string", name: "vermittler_id")]
-        int $agentId = 0
+        protected int $agentId = 0,
+
+        #[ORM\Column(type: "boolean", name: "geloescht", nullable: false)]
+        #[Ignore]
+        protected bool $isDeleted = false,
+
+        // @todo connect to Entities
+        protected $addresses = null,
+        protected $agent = null,
     ) {
 
     }
@@ -98,21 +118,21 @@ class CustomerEntity extends AbstractEntity
      * getName
      * @return string
      */
-    public function getName(): string
+    public function getLastName(): string
     {
-        return $this->name;
+        return $this->lastName;
     }
 
     /**
      * setName
      *
-     * @param string|null $name
+     * @param string|null $lastName
      *
      * @return $this
      */
-    public function setName(?string $name): static
+    public function setLastName(?string $lastName): static
     {
-        $this->name = (string)$name;
+        $this->lastName = (string)$lastName;
 
         return $this;
     }
@@ -164,24 +184,24 @@ class CustomerEntity extends AbstractEntity
     }
 
     /**
-     * getSex
+     * setGender
      * @return string|null
      */
-    public function getSex(): ?string
+    public function getGender(): ?string
     {
-        return $this->sex;
+        return $this->gender;
     }
 
     /**
-     * setSex
+     * setGender
      *
-     * @param string|null $sex
+     * @param string|null $gender
      *
      * @return $this
      */
-    public function setSex(?string $sex): static
+    public function setGender(?string $gender): static
     {
-        $this->sex = (string)$sex;
+        $this->gender = (string)$gender;
 
         return $this;
     }

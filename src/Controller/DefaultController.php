@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Service\ServiceSubscriberTraits\JsonRequestDecoderAware;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +17,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class DefaultController extends AbstractController
 {
+    use JsonRequestDecoderAware;
+
     /**
      * Use this response code for al failed responses to be able to change them in one place.
      */
@@ -23,6 +26,7 @@ class DefaultController extends AbstractController
 
     /**
      * getJsonFailedResponse
+     *
      * @param \Exception $ex
      * @param int        $status
      * @param array      $headers
@@ -50,5 +54,4 @@ class DefaultController extends AbstractController
             $context
         );
     }
-
 }
